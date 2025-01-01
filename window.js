@@ -1,5 +1,12 @@
 console.log("[Window Script]: Window script loaded");
 
+const supportedSites = [
+    'google.com',
+    'chatgpt.com',
+    'chatgpt.com',
+    'claude.ai'
+];
+
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('[Window Script]: DOMContentLoaded event fired');
 
@@ -112,7 +119,7 @@ async function processTab(tab) {
     console.log('[Window Script]: Processing tab:', tab.id, url);
 
     // Добавляем поддержку ChatGPT
-    if (url.includes('google.com') || url.includes('chat.openai.com') || url.includes('chatgpt.com')) {
+    if (supportedSites.some(site => url.includes(site))) {
         console.log('[Window Script]: Supported site detected');
 
         try {

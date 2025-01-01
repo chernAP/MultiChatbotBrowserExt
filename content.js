@@ -1,5 +1,3 @@
-console.log('[Content Script]: Loaded');
-
 const siteHandlers = {
     google: {
         matches: (url) => {
@@ -61,8 +59,89 @@ const siteHandlers = {
                 }
             }, 100);
         }
+    },
+    claude: {
+        matches: (url) => {
+            console.log('[Claude Handler]: Checking URL', url);
+            return url.includes('claude.ai');
+        },
+        getInputField: () => {
+            console.log('[Claude Handler]: Getting input field');
+            const input = document.querySelector('div[contenteditable="true"].ProseMirror');
+            console.log('[Claude Handler]: Input field:', input);
+            return input;
+        },
+        submitAction: async (input) => {
+            console.log('[Claude Handler]: Submitting action');
+
+            // Проверяем, находимся ли мы на странице нового чата
+            if (window.location.href.includes('claude.ai/new')) {
+                console.log('[Claude Handler]: On new chat page, waiting for initialization');
+                // Ждем инициализации чата
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+
+            // Очищаем содержимое
+            input.innerHTML = '';
+
+            // Создаем параграф
+            const p = document.createElement('p');
+            p.textContent = input.value || '';
+            input.appendChild(p);
+
+            // Симулируем события
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+
+            // Ждем обновления React состояния
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            // Симулируем нажатие Enter
+            const enterEvent = new KeyboardEvent('keydown', {
+                key: 'Enter',
+                code: 'Enter',
+                keyCode: 13,
+                which: 13,
+                bubbles: true,
+                cancelable: true,
+                composed: true
+            });
+            input.dispatchEvent(enterEvent);
+
+            // Если Enter не сработал, пробуем кнопку
+            setTimeout(() => {
+                const button = document.querySelector('button[aria-label="Send Message"]');
+                if (button && !button.disabled) {
+                    const clickEvent = new MouseEvent('click', {
+                        bubbles: true,
+                        cancelable: true,
+                        view: window
+                    });
+                    button.dispatchEvent(clickEvent);
+                }
+            }, 100);
+        }
     }
 };
+
+function simulateSubmit(input) {
+    // Find and click the send button
+    const button = document.querySelector('button[aria-label="Send Message"]');
+    if (button && !button.disabled) {
+        button.click();
+    } else {
+        // Fallback to Enter key
+        const enterEvent = new KeyboardEvent('keydown', {
+            key: 'Enter',
+            code: 'Enter',
+            keyCode: 13,
+            which: 13,
+            bubbles: true,
+            cancelable: true
+        });
+        input.dispatchEvent(enterEvent);
+    }
+}
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log('[onMessage Listener]: Received request', request);

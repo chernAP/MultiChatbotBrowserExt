@@ -28,3 +28,19 @@ Browser extension for Chrome that allows sending the same message to multiple AI
    - Adding correct event simulation
    - Implementing proper text insertion method
    - Adding delay for button activation
+6. Attempt: Implementing Claude.ai integration by:
+   - Adding Claude handler to content.js
+   - Implementing proper text insertion for contenteditable div
+   - Adding button click simulation using aria-label selector
+   - Adding Return key simulation as fallback
+7. Attempt: Fixed Claude.ai integration by:
+   - Adding check for active conversation
+   - Implementing automatic new chat creation if needed
+   - Adding proper delays for React state updates
+   - Improving error handling for UUID issues
+8. Success: Fixed Claude.ai message sending by:
+   - Properly simulating click event using MouseEvent constructor
+   - Adding both click and Enter key simulation
+   - Increasing timeout for React state updates
+   - Adding proper event bubbling
+   - Improving button state verification
