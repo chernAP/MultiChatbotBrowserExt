@@ -111,8 +111,9 @@ async function processTab(tab) {
     const url = tab.url;
     console.log('[Window Script]: Processing tab:', tab.id, url);
 
-    if (url.includes('google.com')) {
-        console.log('[Window Script]: Google.com detected');
+    // Добавляем поддержку ChatGPT
+    if (url.includes('google.com') || url.includes('chat.openai.com') || url.includes('chatgpt.com')) {
+        console.log('[Window Script]: Supported site detected');
 
         try {
             // Инжектируем content script
@@ -123,9 +124,9 @@ async function processTab(tab) {
             });
             console.log('[Window Script]: Content script injected successfully');
 
-            // Даём время на инициализацию
+            // Увеличиваем время ожидания для инициализации
             console.log('[Window Script]: Waiting for initialization');
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await new Promise(resolve => setTimeout(resolve, 1000));
 
             const text = document.getElementById('inputText').value;
             console.log('[Window Script]: Text to send:', text);

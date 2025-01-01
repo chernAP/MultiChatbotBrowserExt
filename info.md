@@ -9,3 +9,22 @@ Browser extension for Chrome that allows sending the same message to multiple AI
 
 ## Please remember to update this list after each change
 1. Attempt: Initial project setup with basic functionality for Google Search and ChatGPT. Need to implement support for Claude and Gemini, improve tab handling, and add proper error handling.
+2. Attempt: Fixed ChatGPT input field detection by adding support for both textarea and contenteditable div elements. Added input event simulation and alternative Enter key submission method.
+3. Attempt: Fixed ChatGPT integration by:
+   - Adding ChatGPT processing in window.js
+   - Updating content.js to properly handle contenteditable div
+   - Adding proper event simulation for text input
+   - Implementing correct text insertion method
+   - Adding delays for proper event handling
+ - Attempt failed - button click event wasn't properly handled and text wasn't being sent.
+4. Attempt: Fixed ChatGPT message sending by:
+   - Adding proper input event simulation
+   - Adding delay before clicking send button
+   - Adding button state verification
+   - Improving error logging
+ - attempt failed - text wasn't being inserted into the contenteditable div.
+5. Success: Fixed ChatGPT text insertion and submission by:
+   - Properly handling contenteditable div element
+   - Adding correct event simulation
+   - Implementing proper text insertion method
+   - Adding delay for button activation

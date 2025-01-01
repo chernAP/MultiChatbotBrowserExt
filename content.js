@@ -29,30 +29,43 @@ const siteHandlers = {
         },
         getInputField: () => {
             console.log('[ChatGPT Handler]: Getting input field');
-            const input = document.querySelector('div#prompt-textarea.ProseMirror');
+            const input = document.querySelector('div#prompt-textarea[contenteditable="true"]');
             console.log('[ChatGPT Handler]: Input field:', input);
             return input;
         },
         submitAction: (input) => {
             console.log('[ChatGPT Handler]: Submitting action');
-            const button = document.querySelector('button[data-testid="send-button"]');
-            console.log('[ChatGPT Handler]: Send button:', button);
-            if (button) {
-                console.log('[ChatGPT Handler]: Clicking send button');
-                button.click();
-            }
+
+            // Очищаем содержимое перед вставкой
+            input.innerHTML = '';
+
+            // Создаем параграф для текста
+            const p = document.createElement('p');
+            p.textContent = input.value || '';
+            input.appendChild(p);
+
+            // Эмулируем события ввода
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+
+            // Даем время на обработку событий и активацию кнопки
+            setTimeout(() => {
+                const button = document.querySelector('button[data-testid="send-button"]');
+                console.log('[ChatGPT Handler]: Found send button:', button);
+
+                if (button && !button.disabled) {
+                    console.log('[ChatGPT Handler]: Clicking send button');
+                    button.click();
+                } else {
+                    console.log('[ChatGPT Handler]: Send button not found or disabled');
+                }
+            }, 100);
         }
     }
 };
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log('[onMessage Listener]: Received request', request);
-
-    if (request.action === 'ping') {
-        console.log('[Ping Action]: Responding with success');
-        sendResponse({ success: true });
-        return true;
-    }
 
     if (request.action === 'focusAndFill') {
         console.log('[FocusAndFill Action]: Starting process');
@@ -81,7 +94,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             console.log('[FocusAndFill Action]: Focusing input');
             input.focus();
 
-            console.log('[FocusAndFill Action]: Setting input value', request.text);
+            // Сохраняем текст в свойство value для использования в submitAction
             input.value = request.text;
 
             console.log('[FocusAndFill Action]: Performing submit action');
@@ -95,6 +108,5 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         }
     }
 
-    console.log('[onMessage Listener]: Returning true');
     return true;
 });
