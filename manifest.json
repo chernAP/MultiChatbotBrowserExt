@@ -10,7 +10,7 @@
     "tabs"
   ],
   "host_permissions": [
-    "https://www.google.com/*",
+    "https://google.com/*",
     "https://chatgpt.com/*",
     "https://claude.ai/*",
     "https://gemini.google.com/*"
