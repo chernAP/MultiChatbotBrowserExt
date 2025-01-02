@@ -1,7 +1,25 @@
-.tab-checkbox{
+.tab-checkbox {
     display: inline;
 }
 
-.tab-title{
+.tab-title {
     display: inline;
+}
+
+/* Стиль для неподдерживаемых вкладок */
+.tab-item.unsupported {
+    opacity: 0.5;
+    color: #666;
+    cursor: not-allowed;
+}
+
+/* Стиль для чекбокса неподдерживаемой вкладки */
+.tab-item.unsupported .tab-checkbox {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Стиль для активной вкладки */
+.tab-item.supported {
+    color: #000;
 }

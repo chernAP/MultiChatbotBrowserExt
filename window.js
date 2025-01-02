@@ -4,8 +4,13 @@ const supportedSites = [
     'google.com',
     'chatgpt.com',
     'chatgpt.com',
-    'claude.ai'
+    'claude.ai',
+    'apps.abacus.ai'
 ];
+
+function isSupportedUrl(url) {
+    return supportedSites.some(site => url.includes(site));
+}
 
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('[Window Script]: DOMContentLoaded event fired');
@@ -36,11 +41,22 @@ document.addEventListener('DOMContentLoaded', async function() {
         const tabItem = document.createElement('div');
         tabItem.className = 'tab-item';
 
+        // Проверяем, поддерживается ли URL
+        const isSupported = isSupportedUrl(tab.url);
+
+        // Добавляем класс в зависимости от поддержки
+        tabItem.classList.add(isSupported ? 'supported' : 'unsupported');
+
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.className = 'tab-checkbox';
-        checkbox.checked = selectedTabs[tab.id] || false;
+        checkbox.checked = isSupported && (selectedTabs[tab.id] || false);
         checkbox.dataset.tabId = tab.id;
+
+        // Делаем чекбокс неактивным для неподдерживаемых сайтов
+        if (!isSupported) {
+            checkbox.disabled = true;
+        }
 
         const title = document.createElement('div');
         title.className = 'tab-title';
@@ -51,26 +67,29 @@ document.addEventListener('DOMContentLoaded', async function() {
         tabItem.appendChild(title);
         tabsList.appendChild(tabItem);
 
-        console.log('[Window Script]: Вкладка добавлена в список:', tab.id, tab.title);
+        console.log('[Window Script]: Вкладка добавлена в список:', tab.id, tab.title,
+            'Поддерживается:', isSupported);
 
-        // Сохраняем состояние чекбокса при изменении
-        checkbox.addEventListener('change', async () => {
-            console.log('[Window Script]: Изменение состояния чекбокса для вкладки:', tab.id);
+        // Добавляем обработчик только для поддерживаемых сайтов
+        if (isSupported) {
+            checkbox.addEventListener('change', async () => {
+                console.log('[Window Script]: Изменение состояния чекбокса для вкладки:', tab.id);
 
-            const { selectedTabs = {} } = await chrome.storage.local.get('selectedTabs');
-            console.log('[Window Script]: Текущие выбранные вкладки:', selectedTabs);
+                const { selectedTabs = {} } = await chrome.storage.local.get('selectedTabs');
+                console.log('[Window Script]: Текущие выбранные вкладки:', selectedTabs);
 
-            if (checkbox.checked) {
-                selectedTabs[tab.id] = true;
-                console.log('[Window Script]: Вкладка выбрана:', tab.id);
-            } else {
-                delete selectedTabs[tab.id];
-                console.log('[Window Script]: Вкладка отменена:', tab.id);
-            }
+                if (checkbox.checked) {
+                    selectedTabs[tab.id] = true;
+                    console.log('[Window Script]: Вкладка выбрана:', tab.id);
+                } else {
+                    delete selectedTabs[tab.id];
+                    console.log('[Window Script]: Вкладка отменена:', tab.id);
+                }
 
-            await chrome.storage.local.set({ selectedTabs });
-            console.log('[Window Script]: Сохраненное состояние вкладок:', selectedTabs);
-        });
+                await chrome.storage.local.set({ selectedTabs });
+                console.log('[Window Script]: Сохраненное состояние вкладок:', selectedTabs);
+            });
+        }
     });
 
     sendButton.addEventListener('click', async () => {
