@@ -1,20 +1,18 @@
 <!DOCTYPE html>
-<!-- window.html -->
 <html>
 <head>
   <meta charset="UTF-8">
   <style>
-    body {
-      min-width: 400px;
-      padding: 20px;
-      margin: 0;
-    }
   </style>
 </head>
 <body>
-  <div class="tabs-container" id="tabsList"></div>
-  <textarea id="inputText" placeholder="Введите текст для отправки..."></textarea>
-  <button id="sendButton">Отправить</button>
+  <div class="wrapper">
+    <div class="tabs-container" id="tabsList"></div>
+    <div class="textbox-container">
+      <textarea id="inputText" placeholder="Введите текст для отправки..."></textarea>
+      <button id="sendButton">Отправить</button>
+    </div>
+  </div>
   <script src="window.js"></script>
   <link rel="stylesheet" href="style.css">
 </body>

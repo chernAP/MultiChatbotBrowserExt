@@ -1,9 +1,66 @@
+body {
+    min-width: 400px;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.tabs-container {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 16px;
+}
+
+.textbox-container {
+    flex-shrink: 0;
+    background-color: white;
+    width: 100%;
+}
+
 .tab-checkbox {
-    display: inline;
+    flex-shrink: 0;
+    margin-right: 8px;
 }
 
 .tab-title {
-    display: inline;
+    flex-shrink: 1;
+    min-width: 0;
+    margin-right: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tab-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    width: 100%;
+}
+
+.tab-content {
+    display: flex;
+    align-items: center;
+    flex-basis: 66.66%;
+    max-width: 66.66%;
+}
+
+/* Стиль для ссылок */
+.tab-url {
+    color: #999;
+    font-size: 0.8em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Стиль для неподдерживаемых вкладок */
@@ -22,4 +79,14 @@
 /* Стиль для активной вкладки */
 .tab-item.supported {
     color: #000;
+}
+
+#inputText {
+    width: 100%;
+    min-height: 100px;
+    padding: 8px;
+    margin-bottom: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
 }
