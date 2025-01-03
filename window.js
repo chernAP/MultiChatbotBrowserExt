@@ -8,6 +8,9 @@ const supportedSites = [
     "apps.abacus.ai",
 ];
 
+// Добавляем переменную для отслеживания направления сортировки
+let sortDirection = 'desc'; // 'desc' - от новых к старым, 'asc' - от старых к новым
+
 function isSupportedUrl(url) {
     return supportedSites.some((site) => url.includes(site));
 }
@@ -24,123 +27,118 @@ document.addEventListener("DOMContentLoaded", async function () {
     const inputText = document.getElementById("inputText");
     console.log("[Window Script]: Input text element:", inputText);
 
-    // Загружаем сохраненные выбранные вкладки
-    console.log("[Window Script]: Загружаем сохраненные выбранные вкладки...");
-    const { selectedTabs = {} } = await chrome.storage.local.get(
-        "selectedTabs"
-    );
-    console.log(
-        "[Window Script]: Сохраненные выбранные вкладки:",
-        selectedTabs
-    );
+    // Добавляем кнопку сортировки
+    const sortButton = document.createElement("button");
+    sortButton.id = "sortButton";
+    sortButton.textContent = "Сортировка";
 
-    // Получаем список всех вкладок
-    console.log("[Window Script]: Получаем список всех вкладок...");
-    const tabs = await chrome.tabs.query({});
-    console.log("[Window Script]: Список всех вкладок:", tabs);
+    // Загружаем сохраненное направление сортировки
+    const { savedSortDirection } = await chrome.storage.local.get("savedSortDirection");
+    if (savedSortDirection) {
+        sortDirection = savedSortDirection;
+    }
+    sortButton.className = sortDirection;
 
-    // Создаем элементы для каждой вкладки
-    // В функции обработчике DOMContentLoaded, где создаются элементы вкладок:
-    tabs.forEach((tab) => {
-        console.log(
-            "[Window Script]: Creating tab item for:",
-            tab.id,
-            tab.title
-        );
+    tabsList.parentElement.insertBefore(sortButton, tabsList);
 
-        const tabItem = document.createElement("div");
-        tabItem.className = "tab-item";
+    // Функция сортировки вкладок
+    function sortTabs(tabs) {
+        return [...tabs].sort((a, b) => {
+            if (sortDirection === 'desc') {
+                return b.id - a.id; // От новых к старым
+            } else {
+                return a.id - b.id; // От старых к новым
+            }
+        });
+    }
 
-        // Проверяем, поддерживается ли URL
-        const isSupported = isSupportedUrl(tab.url);
+    // Функция обновления отображения вкладок
+    async function updateTabsList() {
+        const tabs = await chrome.tabs.query({});
+        const { selectedTabs = {} } = await chrome.storage.local.get("selectedTabs");
 
-        // Добавляем класс в зависимости от поддержки
-        tabItem.classList.add(isSupported ? "supported" : "unsupported");
+        // Очищаем текущий список
+        tabsList.innerHTML = '';
 
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.className = "tab-checkbox";
-        checkbox.checked = isSupported && (selectedTabs[tab.id] || false);
-        checkbox.dataset.tabId = tab.id;
+        // Сортируем вкладки
+        const sortedTabs = sortTabs(tabs);
 
-        // Делаем чекбокс неактивным для неподдерживаемых сайтов
-        if (!isSupported) {
-            checkbox.disabled = true;
-        }
+        // Создаем элементы для каждой вкладки
+        sortedTabs.forEach((tab) => {
+            console.log("[Window Script]: Creating tab item for:", tab.id, tab.title);
 
-        const title = document.createElement("div");
-        title.className = "tab-title";
-        title.title = tab.title;
-        title.textContent = tab.title;
+            const tabItem = document.createElement("div");
+            tabItem.className = "tab-item";
 
-        // Создаем элемент для URL
-        const url = document.createElement("div");
-        url.className = "tab-url";
-        url.textContent = tab.url;
-        url.title = tab.url; // Это создаст всплывающую подсказку при наведении
+            const isSupported = isSupportedUrl(tab.url);
+            tabItem.classList.add(isSupported ? "supported" : "unsupported");
 
-        tabItem.appendChild(checkbox);
-        tabItem.appendChild(title);
-        tabItem.appendChild(url);
-        tabsList.appendChild(tabItem);
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.className = "tab-checkbox";
+            checkbox.checked = isSupported && (selectedTabs[tab.id] || false);
+            checkbox.dataset.tabId = tab.id;
 
-        console.log(
-            "[Window Script]: Вкладка добавлена в список:",
-            tab.id,
-            tab.title,
-            "Поддерживается:",
-            isSupported
-        );
+            if (!isSupported) {
+                checkbox.disabled = true;
+            }
 
-        // Добавляем обработчик только для поддерживаемых сайтов
-        if (isSupported) {
-            checkbox.addEventListener("change", async () => {
-                console.log(
-                    "[Window Script]: Изменение состояния чекбокса для вкладки:",
-                    tab.id
-                );
+            const title = document.createElement("div");
+            title.className = "tab-title";
+            title.title = tab.title;
+            title.textContent = tab.title;
 
-                const { selectedTabs = {} } = await chrome.storage.local.get(
-                    "selectedTabs"
-                );
-                console.log(
-                    "[Window Script]: Текущие выбранные вкладки:",
-                    selectedTabs
-                );
+            const url = document.createElement("div");
+            url.className = "tab-url";
+            url.textContent = tab.url;
+            url.title = tab.url;
 
-                if (checkbox.checked) {
-                    selectedTabs[tab.id] = true;
-                    console.log("[Window Script]: Вкладка выбрана:", tab.id);
-                } else {
-                    delete selectedTabs[tab.id];
-                    console.log("[Window Script]: Вкладка отменена:", tab.id);
-                }
+            tabItem.appendChild(checkbox);
+            tabItem.appendChild(title);
+            tabItem.appendChild(url);
+            tabsList.appendChild(tabItem);
 
-                await chrome.storage.local.set({ selectedTabs });
-                console.log(
-                    "[Window Script]: Сохраненное состояние вкладок:",
-                    selectedTabs
-                );
-            });
-        }
+            if (isSupported) {
+                checkbox.addEventListener("change", async () => {
+                    const { selectedTabs = {} } = await chrome.storage.local.get("selectedTabs");
+                    if (checkbox.checked) {
+                        selectedTabs[tab.id] = true;
+                    } else {
+                        delete selectedTabs[tab.id];
+                    }
+                    await chrome.storage.local.set({ selectedTabs });
+                });
+            }
+        });
+    }
+
+    // Обработчик клика по кнопке сортировки
+    sortButton.addEventListener("click", async () => {
+        console.log("[Window Script]: Sort button clicked");
+
+        // Меняем направление сортировки
+        sortDirection = sortDirection === 'desc' ? 'asc' : 'desc';
+
+        // Сохраняем направление сортировки
+        await chrome.storage.local.set({ savedSortDirection: sortDirection });
+
+        // Обновляем класс кнопки
+        sortButton.className = sortDirection;
+
+        // Обновляем список вкладок
+        await updateTabsList();
     });
 
+    // Инициализация: отображаем вкладки
+    await updateTabsList();
     sendButton.addEventListener("click", async () => {
         console.log("[Window Script]: Кнопка отправки нажата");
 
-        const { selectedTabs = {} } = await chrome.storage.local.get(
-            "selectedTabs"
-        );
-        console.log(
-            "[Window Script]: Выбранные вкладки из хранилища:",
-            selectedTabs
-        );
+        const { selectedTabs = {} } = await chrome.storage.local.get("selectedTabs");
+        console.log("[Window Script]: Выбранные вкладки из хранилища:", selectedTabs);
 
         const selectedTabIds = Object.keys(selectedTabs).map(Number);
-        console.log(
-            "[Window Script]: Выбранные вкладки для отправки:",
-            selectedTabIds
-        );
+        console.log("[Window Script]: Выбранные вкладки для отправки:", selectedTabIds);
 
         // Последовательно обрабатываем каждую вкладку
         for (const tabId of selectedTabIds) {
@@ -158,22 +156,13 @@ document.addEventListener("DOMContentLoaded", async function () {
                 // Выполняем действие в зависимости от типа сайта
                 await processTab(tab);
 
-                console.log(
-                    "[Window Script]: Обработка вкладки завершена:",
-                    tabId
-                );
+                console.log("[Window Script]: Обработка вкладки завершена:", tabId);
 
                 // Добавляем небольшую задержку между обработкой вкладок
                 await new Promise((resolve) => setTimeout(resolve, 500));
-                console.log(
-                    "[Window Script]: Задержка между вкладками выполнена"
-                );
+                console.log("[Window Script]: Задержка между вкладками выполнена");
             } catch (error) {
-                console.error(
-                    "[Window Script]: Ошибка при обработке вкладки:",
-                    tabId,
-                    error
-                );
+                console.error("[Window Script]: Ошибка при обработке вкладки:", tabId, error);
             }
         }
     });
@@ -181,11 +170,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 // Функция обработки вкладки
 async function processTab(tab) {
-    console.log(
-        "[Window Script]: processTab started for tab:",
-        tab.id,
-        tab.url
-    );
+    console.log("[Window Script]: processTab started for tab:", tab.id, tab.url);
 
     const url = tab.url;
     console.log("[Window Script]: Processing tab:", tab.id, url);
@@ -201,9 +186,7 @@ async function processTab(tab) {
                 target: { tabId: tab.id },
                 files: ["content.js"],
             });
-            console.log(
-                "[Window Script]: Content script injected successfully"
-            );
+            console.log("[Window Script]: Content script injected successfully");
 
             // Увеличиваем время ожидания для инициализации
             console.log("[Window Script]: Waiting for initialization");
@@ -219,10 +202,7 @@ async function processTab(tab) {
             console.log("[Window Script]: Response received:", response);
 
             if (!response?.success) {
-                console.error(
-                    "[Window Script]: Failed to process tab:",
-                    response?.error || "Unknown error"
-                );
+                console.error("[Window Script]: Failed to process tab:", response?.error || "Unknown error");
             }
         } catch (error) {
             console.error("[Window Script]: Error processing tab:", error);
