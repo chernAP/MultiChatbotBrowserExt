@@ -20,11 +20,11 @@ body {
     flex: 1;
     flex-direction: column;
     overflow: hidden;
+    min-width: 300px;
 }
 
 .right-panel{
     flex: 1;
-    background-color: #666;
     display: none;
 }
 
@@ -144,5 +144,9 @@ body {
 .buttons-container {
     display: flex;
     justify-content: space-between;
-    padding: 8px 20px;
+    padding: 10px 10px;
+    flex-shrink: 0;
+    width: 100%;
+    box-sizing: border-box;
 }
+

@@ -2,7 +2,7 @@
 let windowId = null;
 
 // Активация сервис-воркера
-self.addEventListener('activate', event => {
+self.addEventListener('activate', () => {
   console.log('[Background] Service worker activated');
 });
 
@@ -24,7 +24,7 @@ chrome.action.onClicked.addListener(async () => {
     const window = await chrome.windows.create({
       url: 'window.html',
       type: 'popup',
-      width: 500,
+      width: 750,
       height: 600
     });
 
