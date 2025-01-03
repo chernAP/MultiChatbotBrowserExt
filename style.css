@@ -117,3 +117,9 @@ body {
 #sortButton.asc::after {
     content: " ↑";
 }
+
+.buttons-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 20px;
+}
