@@ -10,8 +10,22 @@ body {
 
 .wrapper {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     height: 100%;
+    overflow: hidden;
+}
+
+.main-panel {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.right-panel{
+    flex: 1;
+    background-color: #666;
+    display: none; /* TODO при нажатии на кнопки меняется */
 }
 
 .tabs-container {

@@ -11,6 +11,8 @@ const supportedSites = [
 // Добавляем переменную для отслеживания направления сортировки
 let sortDirection = 'desc'; // 'desc' - от новых к старым, 'asc' - от старых к новым
 
+let isRightPanelVisible = false;
+
 function isSupportedUrl(url) {
     return supportedSites.some((site) => url.includes(site));
 }
@@ -166,6 +168,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
         }
     });
+    ы
 });
 
 // Функция обработки вкладки

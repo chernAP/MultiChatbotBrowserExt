@@ -1,27 +1,32 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="UTF-8">
   <style>
   </style>
 </head>
+
 <body>
   <div class="wrapper">
-
-    <div class="sort-container">
+    <div class="main-panel">
+      <div class="sort-container">
+      </div>
+      <div class="tabs-container" id="tabsList"></div>
+      <div class="buttons-container">
+        <button class="button" id="openHistoryButton">История</button>
+        <button class="button" id="openSavedPromptsButton">Сохранённые запросы</button>
+        <button class="button" id="openSettingsButton">Настройки</button>
+      </div>
+      <div class="textbox-container">
+        <textarea id="inputText" placeholder="Введите текст для отправки..."></textarea>
+        <button class="button" id="sendButton">Отправить</button>
+      </div>
     </div>
-    <div class="tabs-container" id="tabsList"></div>
-    <div class = "buttons-container">
-      <button class="button" id="openHistoryButton">История</button>
-      <button class="button" id="openSavedPromptsButton">Сохранённые запросы</button>
-      <button class="button" id="openSettingsButton">Настройки</button>
-    </div>
-    <div class="textbox-container">
-      <textarea id="inputText" placeholder="Введите текст для отправки..."></textarea>
-      <button class="button" id="sendButton">Отправить</button>
-    </div>
+    <div class="right-panel"></div>
   </div>
   <script src="window.js"></script>
   <link rel="stylesheet" href="style.css">
 </body>
+
 </html>
