@@ -1,6 +1,6 @@
 console.log("[Window Script]: Window script loaded");
 
-const supportedSites = [
+const SUPPORTED_SITES = [
     "google.com",
     "chatgpt.com",
     "chatgpt.com",
@@ -8,13 +8,76 @@ const supportedSites = [
     "apps.abacus.ai",
 ];
 
+
 // Добавляем переменную для отслеживания направления сортировки
 let sortDirection = 'desc'; // 'desc' - от новых к старым, 'asc' - от старых к новым
 
 let isRightPanelVisible = false;
+let activeButton = null;
+let currentPanel = null;
+
+function toggleRightPanel(panelType, button) {
+    const rightPanel = document.querySelector('.right-panel');
+
+    // Если нажата та же кнопка - закрываем панель
+    if (activeButton === button) {
+        rightPanel.classList.remove('visible');
+        button.classList.remove('active');
+        activeButton = null;
+        currentPanel = null;
+        return;
+    }
+
+    // Если была нажата другая кнопка - убираем активный класс
+    if (activeButton) {
+        activeButton.classList.remove('active');
+    }
+
+    // Активируем новую кнопку и показываем панель
+    button.classList.add('active');
+    activeButton = button;
+    currentPanel = panelType;
+
+    // Очищаем и обновляем содержимое панели
+    rightPanel.innerHTML = '';
+
+    // Добавляем заголовок
+    const header = document.createElement('h3');
+    header.style.margin = '0 0 20px 0';
+
+    // Добавляем плейсхолдер контент в зависимости от типа панели
+    switch (panelType) {
+        case 'history':
+            header.textContent = 'История';
+            rightPanel.appendChild(header);
+            rightPanel.appendChild(createPlaceholder('История запросов будет отображаться здесь'));
+            break;
+        case 'saved':
+            header.textContent = 'Сохранённые запросы';
+            rightPanel.appendChild(header);
+            rightPanel.appendChild(createPlaceholder('Сохранённые запросы будут отображаться здесь'));
+            break;
+        case 'settings':
+            header.textContent = 'Настройки';
+            rightPanel.appendChild(header);
+            rightPanel.appendChild(createPlaceholder('Настройки будут отображаться здесь'));
+            break;
+    }
+
+    rightPanel.classList.add('visible');
+}
+
+function createPlaceholder(text) {
+    const placeholder = document.createElement('div');
+    placeholder.style.color = '#666';
+    placeholder.style.textAlign = 'center';
+    placeholder.style.padding = '20px';
+    placeholder.textContent = text;
+    return placeholder;
+}
 
 function isSupportedUrl(url) {
-    return supportedSites.some((site) => url.includes(site));
+    return SUPPORTED_SITES.some((site) => url.includes(site));
 }
 
 document.addEventListener("DOMContentLoaded", async function () {
@@ -168,7 +231,13 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
         }
     });
-    ы
+    const historyButton = document.getElementById("openHistoryButton");
+    const savedPromptsButton = document.getElementById("openSavedPromptsButton");
+    const settingsButton = document.getElementById("openSettingsButton");
+
+    historyButton.addEventListener('click', () => toggleRightPanel('history', historyButton));
+    savedPromptsButton.addEventListener('click', () => toggleRightPanel('saved', savedPromptsButton));
+    settingsButton.addEventListener('click', () => toggleRightPanel('settings', settingsButton));
 });
 
 // Функция обработки вкладки
@@ -179,7 +248,7 @@ async function processTab(tab) {
     console.log("[Window Script]: Processing tab:", tab.id, url);
 
     // Добавляем поддержку ChatGPT
-    if (supportedSites.some((site) => url.includes(site))) {
+    if (SUPPORTED_SITES.some((site) => url.includes(site))) {
         console.log("[Window Script]: Supported site detected");
 
         try {

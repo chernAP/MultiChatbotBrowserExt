@@ -25,7 +25,16 @@ body {
 .right-panel{
     flex: 1;
     background-color: #666;
-    display: none; /* TODO при нажатии на кнопки меняется */
+    display: none;
+}
+
+.right-panel.visible {
+    display: block;
+}
+
+/* Стили для активной кнопки */
+.button.active {
+    background-color: #e0e0e0;
 }
 
 .tabs-container {
